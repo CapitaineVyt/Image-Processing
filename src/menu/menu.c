@@ -2,38 +2,45 @@
 #include "menu.h"
 #include <string.h>
 
-void main_menu() {
+void main_menu(void) {
     printf("--Veuillez choisir une option--\n");
     printf("\t1. Ouvrir une image \n");
     printf("\t2. Sauvegarder une image\n");
     printf("\t3. Appliquer un filtre\n");
-    printf("\t4. Quitter\n");
+    printf("\t4.  Afficher les informations de l'image\n");
+    printf("\t5. Quitter\n");
     
 }
 
-void choice_1(){
+static void choice_1(void){
     char access_path[256] = "";
     printf("Entrez le chemin d'acces de l'image : ");
-    scanf("%s", access_path);
+    fgets(access_path, sizeof(access_path), stdin);
+    access_path[strcspn(access_path, "\n")] = '\0';
     FILE* img = fopen(access_path, "rb"); 
     
     if (img == NULL) {
         printf("No such file or directory\n");
+        return;
     }
 
     fclose(img);
 }
 
-void choice_2(){
+static void choice_2(){
 
 }
 
-void choice_3(){
+static void choice_3(){
 
 }
 
-void choice_4(){
+static void choice_4(){
 
+}
+
+static void choice_5(){
+    
 }
 
 void choice_menu(){
@@ -47,5 +54,7 @@ void choice_menu(){
         choice_3();
     }else if(choice ==4){
         choice_4();
+    }else if(choice ==5){
+        
     }
 }

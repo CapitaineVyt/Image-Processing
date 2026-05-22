@@ -3,19 +3,19 @@
 
 #include <stdio.h>
 
-void main_menu();
+void main_menu(void);
 
 void choice_menu();
 
-void choice_1();
+static void choice_1(void);
 
-void choice_2();
+static void choice_2();
 
-void choice_3();
+static void choice_3();
 
-void choice_4();
+static void choice_4();
 
-void choice_5();
+static void choice_5();
 
 
 #endif
