@@ -1,0 +1,21 @@
+# --- VS Code ---
+.vscode/
+
+# --- Compilation (C Language) ---
+*.o
+*.obj
+*.exe
+*.out
+*.app
+
+# --- Images de sortie (Évite de polluer le repo) ---
+# On garde les originaux mais on ignore les résultats des fonctions
+*negatif.bmp
+*brightness.bmp
+*threshold.bmp
+*equalized.bmp
+*filtered.bmp
+
+# --- Système ---
+.DS_Store
+Thumbs.db
