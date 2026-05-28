@@ -26,7 +26,7 @@ static void choice_1(void){
     FILE* img = fopen(access_path, "rb"); 
     
     if (img == NULL) {
-        printf("No such file or directory\n");
+        fprintf(stderr, "Error: Could not open file '%s'. No such file or directory.\n", access_path);
         return;
     }
 //Libère l'image si l'utilisateur en a déja mise une
@@ -39,7 +39,7 @@ static void choice_1(void){
     }
     image_actuelle = (t_bmp8*) calloc(1, sizeof(t_bmp8));
     if (image_actuelle == NULL) {
-        printf("Erreur d'allocation mémoire\n");
+        fprintf(stderr, "Critical Error: Memory allocation failed for image struct.\n");
         fclose(img);
         return;
     }
@@ -49,7 +49,7 @@ static void choice_1(void){
     if (image_actuelle->header[0]=='B' && image_actuelle->header[1]=='M'){
         printf("Le fichier charge est bien un .bmp\n");
     } else {
-        printf("ERROR! Le format charge n'est pas correct\n");
+        fprintf(stderr, "Error: Invalid format. '%s' is not a standard BMP file.\n", access_path);
     };
     
 
