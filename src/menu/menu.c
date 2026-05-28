@@ -11,7 +11,7 @@ void main_menu(void) {
     printf("\t1. Ouvrir une image \n");
     printf("\t2. Sauvegarder une image\n");
     printf("\t3. Appliquer un filtre\n");
-    printf("\t4.  Afficher les informations de l'image\n");
+    printf("\t4. Afficher les informations de l'image\n");
     printf("\t5. Quitter\n");
     
 }
@@ -22,6 +22,16 @@ static void choice_1(void){
 
     fgets(access_path, sizeof(access_path), stdin);
     access_path[strcspn(access_path, "\n")] = '\0';
+
+//Enlever les guillemets
+    if (access_path[0] == '"') {
+    memmove(access_path, access_path + 1, strlen(access_path));
+    }
+
+    int len = strlen(access_path);
+    if (len > 0 && access_path[len - 1] == '"') {
+        access_path[len - 1] = '\0';
+    }
 
     FILE* img = fopen(access_path, "rb"); 
     
