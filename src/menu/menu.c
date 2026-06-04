@@ -3,6 +3,7 @@
 #include "menu.h"
 #include "../bmp/t_bmp8.h"
 #include <string.h>
+#include "../filter/menu_filtre.h"
 
 t_bmp8 *image_actuelle = NULL;
 
@@ -71,6 +72,7 @@ static void choice_2(){
 }
 
 static void choice_3(){
+    choix_menu();
 
 }
 
