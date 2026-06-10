@@ -4,6 +4,7 @@
 #include "../bmp/t_bmp8.h"
 #include <string.h>
 #include "../filter/menu_filtre.h"
+#include"../filter/filtre.h"
 
 t_bmp8 *image_actuelle = NULL;
 
@@ -50,7 +51,7 @@ static void choice_1(void) {
 }
 
 static void choice_2(){
-
+    
 }
 
 static void choice_3(){
@@ -59,7 +60,7 @@ static void choice_3(){
 }
 
 static void choice_4(){
-
+    bmp8_printInfo(image_actuelle);
 }
 
 static void choice_5(){

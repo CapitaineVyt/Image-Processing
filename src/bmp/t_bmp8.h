@@ -13,9 +13,9 @@ typedef struct {
     unsigned int dataSize;
 } t_bmp8;
 
-t_bmp8 * bmp8_loadImage(const char * filepath);
+t_bmp8 * bmp8_loadImage(char * filepath);
 
-void bmp8_saveImage(const char * filepath, t_bmp8 * img);
+void bmp8_saveImage(char* filepath, t_bmp8 * img);
 
 void bmp8_free(t_bmp8 * img);
 

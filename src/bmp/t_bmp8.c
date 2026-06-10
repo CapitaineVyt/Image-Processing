@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "t_bmp8.h"
 
-t_bmp8 *bmp8_loadImage(const char *filepath) {
+t_bmp8 *bmp8_loadImage(char *filepath) {
     // Ouverture du fichier
     FILE *file = fopen(filepath, "rb");
     if (file == NULL) {
@@ -73,4 +73,13 @@ void bmp8_free(t_bmp8 *img) {
         }
         free(img);
     }
+}
+
+
+void bmp8_printInfo(t_bmp8 * img){
+    printf("Image Info\n");
+    printf("\tWidth : %d\n", img->width);
+    printf("\tHeight : %d\n", img->height);
+    printf("\tColor Depth : %d\n", img->colorDepth);
+    printf("\tData Size : %d", img->dataSize);
 }

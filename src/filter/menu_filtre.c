@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include "menu_filtre.h"
+#include "filtre.h"
 
 
 
 
 
-static void choix_1(){
-
+static void choix_1(img){
+    bmp8_negative(img);
 }
 
 static void choix_2(){
