@@ -75,6 +75,10 @@ void bmp8_free(t_bmp8 *img) {
     }
 }
 
+void bmp8_saveImage(char* filepath, t_bmp8 * img){
+    
+}
+
 
 void bmp8_printInfo(t_bmp8 * img){
     printf("Image Info\n");
