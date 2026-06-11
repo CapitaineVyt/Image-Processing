@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "t_bmp8.h"
 
 t_bmp8 *bmp8_loadImage(char *filepath) {
@@ -75,8 +76,61 @@ void bmp8_free(t_bmp8 *img) {
     }
 }
 
-void bmp8_saveImage(char* filepath, t_bmp8 * img){
-    
+void bmp8_saveImage(const char *filename, t_bmp8 *img){
+    if (img ==NULL || img->data ==NULL){
+        fprintf(stderr,"Erreur ! L'image est vide.");
+        return;
+    }
+    FILE *file = fopen(filename, "wb");
+    if (file ==NULL){
+        fprintf(stderr, "Erreur! Impossible de creer le fichier %s", filename);
+        return;
+    }
+
+    size_t headerWritten = fwrite(img->header, sizeof(unsigned char), 54, file);
+    if (headerWritten !=54){
+        fprintf(stderr, "Erreur lors de l'ecriture du header du fichier. \n");
+        fclose(file);
+        return;
+    }
+
+    int pixelsDataOffset = *(int *)&img->header[10];
+
+    fseek(file, pixelsDataOffset, SEEK_SET);
+
+    size_t pixelsWritten = fwrite(img->data, sizeof(unsigned char), img->dataSize, file);
+
+    if (pixelsWritten != img->dataSize) {
+        fprintf(stderr, "Attention : Erreur lors de l'écriture des pixels (%zu octets écrits sur %d).\n", pixelsWritten, img->dataSize);
+    } else {
+        printf("Image sauvegardée avec succès sous le nom : '%s'\n", filename);
+    }
+
+}
+
+void bmp8_saveWithFilterName(const char *original_path, const char *filter_name, t_bmp8 *img){
+    if (img ==NULL){
+        fprintf(stderr,"Erreur ! L'image est vide.");
+        return;
+    }
+    char new_filename[512] = "";
+
+    const char *file_name =strrchr(original_path, '\\');
+    if(file_name ==NULL){
+        file_name = strrchr(original_path, '/');
+    }
+
+    if(file_name != NULL){
+        file_name++;
+    }else{
+        file_name = original_path;
+    }
+
+    sprintf(new_filename, "output/%S_%s", file_name, new_filename);
+
+    printf("Nom du fichier dans le dossier output: %s\n", new_filename);
+
+    bmp8_saveImage(new_filename, img);
 }
 
 
