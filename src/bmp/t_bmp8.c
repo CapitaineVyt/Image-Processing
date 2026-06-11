@@ -83,7 +83,7 @@ void bmp8_saveImage(const char *filename, t_bmp8 *img){
     }
     FILE *file = fopen(filename, "wb");
     if (file ==NULL){
-        fprintf(stderr, "Erreur! Impossible de creer le fichier %s", filename);
+        fprintf(stderr, "Erreur! Impossible de creer le fichier %s\n", filename);
         return;
     }
 
@@ -108,25 +108,37 @@ void bmp8_saveImage(const char *filename, t_bmp8 *img){
 
 }
 
-void bmp8_saveWithFilterName(const char *original_path, const char *filter_name, t_bmp8 *img){
-    if (img ==NULL){
-        fprintf(stderr,"Erreur ! L'image est vide.");
+#include <stdio.h>
+#include <string.h>
+
+void bmp8_saveWithFilterName(const char *original_path, const char *filter_name, t_bmp8 *img) {
+    if (img == NULL) {
+        printf("Erreur : Aucune image en memoire a sauvegarder.\n");
         return;
     }
+
+    if (original_path == NULL || strlen(original_path) == 0) {
+        original_path = "image.bmp";
+    }
+
     char new_filename[512] = "";
 
-    const char *file_name =strrchr(original_path, '\\');
-    if(file_name ==NULL){
+    const char *file_name = strrchr(original_path, '\\');
+    if (file_name == NULL) {
         file_name = strrchr(original_path, '/');
     }
 
-    if(file_name != NULL){
-        file_name++;
-    }else{
-        file_name = original_path;
+    if (file_name != NULL) {
+        file_name++; 
+    } else {
+        file_name = original_path; 
     }
 
-    sprintf(new_filename, "output/%S_%s", file_name, new_filename);
+    if (strlen(file_name) == 0) {
+        file_name = "default.bmp";
+    }
+
+    sprintf(new_filename, "output/%s_%s", filter_name, file_name);
 
     printf("Nom du fichier dans le dossier output: %s\n", new_filename);
 

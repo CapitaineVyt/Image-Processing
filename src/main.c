@@ -5,7 +5,7 @@
 
 int main(void) {
 
-    choice_menu();
+    run_main_menu();
     
 
 }
