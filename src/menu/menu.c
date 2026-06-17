@@ -23,11 +23,14 @@ static void choice_1(void) {
     char access_path[256] = "";
     printf("Entrez le chemin d'acces de l'image : ");
 
-    // Saisie et nettoyage du chemin 
-    if (fgets(access_path, sizeof(access_path), stdin) == NULL) return;
-    access_path[strcspn(access_path, "\n")] = '\0';
+    // Saisie ultra-simple avec un %s (s'arrête à la touche Entrée)
+    if (scanf("%255s", access_path) != 1) return;
 
-    // Enlever les guillemets 
+    // On nettoie immédiatement le buffer après la saisie du chemin
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    // Enlever les guillemets si l'utilisateur en a mis par copier-coller
     if (access_path[0] == '"') {
         memmove(access_path, access_path + 1, strlen(access_path));
     }
@@ -36,19 +39,22 @@ static void choice_1(void) {
         access_path[len - 1] = '\0';
     }
 
-    // Libération de l'ancienne image 
+    // Libération de l'ancienne image s'il y en avait une
     if (image_actuelle != NULL) {
         bmp8_free(image_actuelle);
         image_actuelle = NULL; 
     }
 
     // Chargement de la nouvelle image 
+    printf("[DEBUG] Tentative de chargement de : '%s'\n", access_path);
     image_actuelle = bmp8_loadImage(access_path);
 
     // Message de confirmation à l'utilisateur
     if (image_actuelle != NULL) {
         strcpy(chemin_origine, access_path);
-        printf("Le fichier charge est bien un .bmp et les pixels sont en memoire.\n");
+        printf("-> SUCCES : Le fichier est charge et les pixels sont en memoire.\n");
+    } else {
+        printf("-> ECHEC : Impossible de charger l'image. Verifie le chemin ou le format.\n");
     }
 }
 
@@ -88,23 +94,25 @@ void run_main_menu(void){
         printf("Votre choix : ");
         
         if (scanf("%d", &choice) != 1) {
-            
             printf("Veuillez entrer un nombre valide.\n");
-            while(getchar() != '\n'); 
+            while(getchar() != '\n'); // Vide le buffer si l'utilisateur écrit du texte
             continue;
         }
     
-        getchar();
+        // NETTOYAGE CRUCIAL : On vide TOUT ce qui traîne dans le buffer jusqu'au '\n'
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF); 
 
         if (choice == 1){
             choice_1();
-        }else if(choice==2){
+        }else if(choice == 2){
             choice_2();
-        }else if(choice ==3){
+        }else if(choice == 3){
             choice_3(image_actuelle, chemin_origine);
-        }else if(choice ==4){
+            choice = 0; // Sécurité pour éviter de reboucler sur l'option 3 au retour
+        }else if(choice == 4){
             choice_4();
-        }else if(choice ==5){
+        }else if(choice == 5){
             choice_5();
         }
     }

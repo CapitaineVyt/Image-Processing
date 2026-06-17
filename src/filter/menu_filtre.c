@@ -23,23 +23,23 @@ static void choix_3(t_bmp8 *img, const char * path){
 }
 
 static void choix_4(t_bmp8 *img, const char * path){
-
+    bmp8_boxBlur(img, path);
 }
 
 static void choix_5(t_bmp8 *img, const char * path){
-
+    bmp8_gaussianBlur(img, path);
 }
 
 static void choix_6(t_bmp8 *img, const char * path){
-
+    bmp8_sharpen(img, path);
 }
 
 static void choix_7(t_bmp8 *img, const char * path){
-
+    bmp8_outline(img, path);
 }
 
 static void choix_8(t_bmp8 *img, const char * path){
-
+    bmp8_emboss(img, path);
 }
 
 void choix_menu(t_bmp8 *img, const char *path){
@@ -65,6 +65,7 @@ void choix_menu(t_bmp8 *img, const char *path){
 
         if (choix == 1){
             choix_1(img, path);
+            return ;
         }else if(choix==2){
             choix_2(img, path);
         }else if(choix ==3){
