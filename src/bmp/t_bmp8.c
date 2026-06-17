@@ -108,8 +108,6 @@ void bmp8_saveImage(const char *filename, t_bmp8 *img){
 
 }
 
-#include <stdio.h>
-#include <string.h>
 
 void bmp8_saveWithFilterName(const char *original_path, const char *filter_name, t_bmp8 *img) {
     if (img == NULL) {
