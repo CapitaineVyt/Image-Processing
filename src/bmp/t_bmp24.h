@@ -27,6 +27,7 @@ typedef struct{
     uint8_t blue;
 } t_pixel;
 
+#pragma pack(push, 1)
 typedef struct {
 uint16_t type;
 uint32_t size;
@@ -48,8 +49,7 @@ int32_t yresolution;
 uint32_t ncolors;
 uint32_t importantcolors;
 } t_bmp_info;
-
-
+#pragma pack(pop)
 
 typedef struct {
 t_bmp_header header;
@@ -78,5 +78,7 @@ void bmp24_writePixelData(t_bmp24 *image, FILE *file);
 void bmp24_saveImage(t_bmp24 *img, const char *filename);
 
 void bmp24_saveWithFilterName(const char *original_path, const char *filter_name, t_bmp24 *img);
+
+void bmp24_free(t_bmp24 *img);
 
 #endif

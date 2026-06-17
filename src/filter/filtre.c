@@ -217,3 +217,121 @@ void bmp24_brightness(t_bmp24 *img, int value, const char *original_path) {
     printf("Luminosite 24 bits ajustee avec succes !\n");
     bmp24_saveWithFilterName(original_path, "brightness", img);
 }
+
+
+t_pixel bmp24_convolution(t_bmp24 *img, int x, int y, float kernel[3][3], int kernelSize) {
+    float sum_r = 0.0f;
+    float sum_g = 0.0f;
+    float sum_b = 0.0f;
+
+    int n = kernelSize / 2; // Pour un masque 3x3, n = 1 [cite: 284, 306]
+
+    // Parcours du masque de -1 à 1 [cite: 306]
+    for (int ky = -n; ky <= n; ky++) {
+        for (int kx = -n; kx <= n; kx++) {
+            // Coordonnées du pixel voisin
+            int px = x + kx;
+            int py = y + ky;
+
+            // Récupération du coefficient du filtre (on décale de +n pour aller de 0 à 2)
+            float k_val = kernel[ky + n][kx + n];
+
+            // Convolution indépendante sur les 3 canaux [cite: 527, 530]
+            sum_r += (float)img->data[py][px].red   * k_val;
+            sum_g += (float)img->data[py][px].green * k_val;
+            sum_b += (float)img->data[py][px].blue  * k_val;
+        }
+    }
+
+    // Clamping de sécurité pour chaque canal (0 à 255) [cite: 531]
+    if (sum_r < 0.0f) sum_r = 0.0f; else if (sum_r > 255.0f) sum_r = 255.0f;
+    if (sum_g < 0.0f) sum_g = 0.0f; else if (sum_g > 255.0f) sum_g = 255.0f;
+    if (sum_b < 0.0f) sum_b = 0.0f; else if (sum_b > 255.0f) sum_b = 255.0f;
+
+    // On retourne le pixel final calculé
+    t_pixel result_pixel;
+    result_pixel.red   = (uint8_t)sum_r;
+    result_pixel.green = (uint8_t)sum_g;
+    result_pixel.blue  = (uint8_t)sum_b;
+
+    return result_pixel;
+}
+
+
+void bmp24_applyFilter(t_bmp24 *img, float kernel[3][3], int kernelSize, const char *original_path, const char *filter_name) {
+    if (img == NULL || img->data == NULL) return;
+
+    // 1. Allouer la matrice temporaire pour stocker le résultat
+    t_pixel **temp_data = bmp24_allocateDataPixels(img->width, img->height);
+    if (temp_data == NULL) return;
+
+    // 2. Appliquer la convolution sur tous les pixels (sauf la bordure de 1 pixel) [cite: 308, 309]
+    for (int y = 0; y < img->height; y++) {
+        for (int x = 0; x < img->width; x++) {
+            // Si on est sur le bord, on garde le pixel d'origine intact [cite: 308]
+            if (y == 0 || y == img->height - 1 || x == 0 || x == img->width - 1) {
+                temp_data[y][x] = img->data[y][x];
+            } else {
+                // Sinon, on calcule la convolution [cite: 541]
+                temp_data[y][x] = bmp24_convolution(img, x, y, kernel, kernelSize);
+            }
+        }
+    }
+
+    // 3. Remplacer l'ancienne matrice par la nouvelle filtrée
+    bmp24_freeDataPixels(img->data, img->height);
+    img->data = temp_data;
+
+    // 4. Sauvegarde automatique avec le nom du filtre !
+    bmp24_saveWithFilterName(original_path, filter_name, img);
+}
+
+// 4. Flou Couleur (Box Blur) [cite: 543]
+void bmp24_boxBlur(t_bmp24 *img, const char *path) {
+    float kernel[3][3] = {
+        {1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f},
+        {1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f},
+        {1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f}
+    }; // [cite: 289, 290]
+    bmp24_applyFilter(img, kernel, 3, path, "boxBlur");
+}
+
+// 5. Flou Gaussien Couleur [cite: 544]
+void bmp24_gaussianBlur(t_bmp24 *img, const char *path) {
+    float kernel[3][3] = {
+        {1.0f/16.0f, 2.0f/16.0f, 1.0f/16.0f},
+        {2.0f/16.0f, 4.0f/16.0f, 2.0f/16.0f},
+        {1.0f/16.0f, 2.0f/16.0f, 1.0f/16.0f}
+    }; // [cite: 290, 291]
+    bmp24_applyFilter(img, kernel, 3, path, "gaussianBlur");
+}
+
+// 6. Netteté Couleur [cite: 546]
+void bmp24_sharpen(t_bmp24 *img, const char *path) {
+    float kernel[3][3] = {
+        { 0.0f, -1.0f,  0.0f},
+        {-1.0f,  5.0f, -1.0f},
+        { 0.0f, -1.0f,  0.0f}
+    }; // [cite: 297, 298]
+    bmp24_applyFilter(img, kernel, 3, path, "sharpen");
+}
+
+// 7. Détection de contours Couleur (Outline)
+void bmp24_outline(t_bmp24 *img, const char *path) {
+    float kernel[3][3] = {
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f,  8.0f, -1.0f},
+        {-1.0f, -1.0f, -1.0f}
+    };
+    bmp24_applyFilter(img, kernel, 3, path, "outline");
+}
+
+// 8. Relief Couleur (Emboss)
+void bmp24_emboss(t_bmp24 *img, const char *path) {
+    float kernel[3][3] = {
+        {-2.0f, -1.0f,  0.0f},
+        {-1.0f,  1.0f,  1.0f},
+        { 0.0f,  1.0f,  2.0f}
+    };
+    bmp24_applyFilter(img, kernel, 3, path, "emboss");
+}
