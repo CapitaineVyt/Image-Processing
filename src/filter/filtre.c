@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../bmp/t_bmp8.h"
+#include "../bmp/t_bmp24.h"
 #include <string.h>
 #include "../filter/menu_filtre.h"
 #include"../filter/filtre.h"
@@ -163,4 +164,56 @@ void bmp8_emboss(t_bmp8 *img, const char *path) {
     }; // [cite: 298]
     bmp8_applyFilter(img, kernel, 3);
     bmp8_saveWithFilterName(path, "emboss", img);
+}
+
+
+// 1. Filtre négatif avec sauvegarde automatique
+void bmp24_negative(t_bmp24 *img, const char *original_path) {
+    if (img == NULL || img->data == NULL) return;
+
+    for (int y = 0; y < img->height; y++) {
+        for (int x = 0; x < img->width; x++) {
+            img->data[y][x].red   = 255 - img->data[y][x].red; 
+            img->data[y][x].green = 255 - img->data[y][x].green; 
+            img->data[y][x].blue  = 255 - img->data[y][x].blue; 
+        }
+    }
+    printf("Filtre negatif 24 bits applique avec succes !\n");
+    bmp24_saveWithFilterName(original_path, "negatif", img);
+}
+
+// 2. Filtre niveaux de gris avec sauvegarde automatique
+// 2. Filtre niveaux de gris avec sauvegarde automatique
+void bmp24_grayscale(t_bmp24 *img, const char *original_path) {
+    if (img == NULL || img->data == NULL) return;
+
+    for (int y = 0; y < img->height; y++) {
+        for (int x = 0; x < img->width; x++) {
+            uint8_t moy = (img->data[y][x].red + img->data[y][x].green + img->data[y][x].blue) / 3;
+            img->data[y][x].red   = moy;
+            img->data[y][x].green = moy;
+            img->data[y][x].blue  = moy;
+        }
+    }
+    printf("Conversion en niveaux de gris (24 bits) reussie !\n");
+    bmp24_saveWithFilterName(original_path, "grayscale", img);
+}
+
+// 3. Filtre luminosité avec sauvegarde automatique
+void bmp24_brightness(t_bmp24 *img, int value, const char *original_path) {
+    if (img == NULL || img->data == NULL) return;
+
+    for (int y = 0; y < img->height; y++) {
+        for (int x = 0; x < img->width; x++) {
+            int r = (int)img->data[y][x].red   + value; 
+            int g = (int)img->data[y][x].green + value; 
+            int b = (int)img->data[y][x].blue  + value; 
+
+            img->data[y][x].red   = (r > 255) ? 255 : ((r < 0) ? 0 : r); 
+            img->data[y][x].green = (g > 255) ? 255 : ((g < 0) ? 0 : g); 
+            img->data[y][x].blue  = (b > 255) ? 255 : ((b < 0) ? 0 : b); 
+        }
+    }
+    printf("Luminosite 24 bits ajustee avec succes !\n");
+    bmp24_saveWithFilterName(original_path, "brightness", img);
 }

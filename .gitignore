@@ -2,7 +2,6 @@
 .vscode/
 
 # --- Dossiers d'images ---
-input/
 output/
 
 # --- Compilation (C Language) ---
@@ -19,6 +18,11 @@ output/
 *threshold.bmp
 *equalized.bmp
 *filtered.bmp
+*boxBlur.bmp
+*gaussianBlur.bmp
+*sharpen.bmp
+*outline.bmp
+*emboss.bmp
 
 # --- Système ---
 .DS_Store
