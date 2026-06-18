@@ -306,7 +306,7 @@ void bmp24_outline(t_bmp24 *img, const char *path) {
     bmp24_applyFilter(img, kernel, 3, path, "outline");
 }
 
-// 8. Relief Couleur Emboss
+// Relief Couleur Emboss
 void bmp24_emboss(t_bmp24 *img, const char *path) {
     float kernel[3][3] = {
         {-2.0f, -1.0f,  0.0f},
@@ -316,12 +316,12 @@ void bmp24_emboss(t_bmp24 *img, const char *path) {
     bmp24_applyFilter(img, kernel, 3, path, "emboss");
 }
 
+// Histogramme 8bits
 void bmp8_histogramEqualization(t_bmp8 *img, const char *path) {
     if (img == NULL || img->data == NULL) return;
 
     int total_pixels = img->width * img->height;
 
-    // 1. Calculer l'histogramme de base
     int histogram[256] = {0};
     for (int y = 0; y < img->height; y++) {
         for (int z = 0; z < img->width; z++) {
@@ -330,14 +330,12 @@ void bmp8_histogramEqualization(t_bmp8 *img, const char *path) {
         }
     }
 
-    // 2. Calculer l'histogramme cumulé (CDF)
     int cdf[256] = {0};
     cdf[0] = histogram[0];
     for (int i = 1; i < 256; i++) {
         cdf[i] = cdf[i - 1] + histogram[i];
     }
 
-    // Trouver la première valeur non nulle de la CDF (cdf_min)
     int cdf_min = 0;
     for (int i = 0; i < 256; i++) {
         if (cdf[i] > 0) {
@@ -346,18 +344,14 @@ void bmp8_histogramEqualization(t_bmp8 *img, const char *path) {
         }
     }
 
-    // Sécurité : si l'image a une seule couleur uniforme
     if (total_pixels - cdf_min == 0) return;
 
-    // 3. Appliquer la formule de transformation sur tous les pixels
     for (int y = 0; y < img->height; y++) {
         for (int x = 0; x < img->width; x++) {
             uint8_t old_val = img->data[y * img->width + x];
             
-            // Formule d'égalisation standardisée
             float equalized = ((float)(cdf[old_val] - cdf_min) / (total_pixels - cdf_min)) * 255.0f;
             
-            // Clamping de sécurité et arrondi mathématique (+0.5f)
             if (equalized < 0.0f) equalized = 0.0f;
             if (equalized > 255.0f) equalized = 255.0f;
             
@@ -365,7 +359,94 @@ void bmp8_histogramEqualization(t_bmp8 *img, const char *path) {
         }
     }
 
-    // 4. Sauvegarde automatique
     bmp8_saveImage("output/equalized_8bit.bmp", img);
     printf("Egalisation 8 bits appliquee avec succes.\n");
+}
+
+// Histogramme 24bits
+void bmp24_histogramEqualization(t_bmp24 *img, const char *path) {
+    if (img == NULL || img->data == NULL) return;
+    int total = img->width * img->height;
+    
+    float **Y = (float **)malloc(img->height * sizeof(float *));
+    float **U = (float **)malloc(img->height * sizeof(float *));
+    float **V = (float **)malloc(img->height * sizeof(float *));
+    for (int y = 0; y < img->height; y++) {
+        Y[y] = (float *)malloc(img->width * sizeof(float));
+        U[y] = (float *)malloc(img->width * sizeof(float));
+        V[y] = (float *)malloc(img->width * sizeof(float));
+    }
+
+    int histogram[256] = {0};
+    for (int y = 0; y < img->height; y++) {
+        for (int x = 0; x < img->width; x++) {
+            float r = img->data[y][x].red;
+            float g = img->data[y][x].green;
+            float b = img->data[y][x].blue;
+
+            float y_val = 0.299f * r + 0.587f * g + 0.114f * b;
+            float u_val = -0.169f * r - 0.331f * g + 0.500f * b + 128.0f;
+            float v_val = 0.500f * r - 0.419f * g - 0.081f * b + 128.0f;
+
+            Y[y][x] = y_val;
+            U[y][x] = u_val;
+            V[y][x] = v_val;
+
+            int y_int = (int)(y_val + 0.5f);
+            if (y_int < 0) y_int = 0;
+            if (y_int > 255) y_int = 255;
+            histogram[y_int]++;
+        }
+    }
+
+    int cdf[256] = {0};
+    cdf[0] = histogram[0];
+    for (int i = 1; i < 256; i++) {
+        cdf[i] = cdf[i - 1] + histogram[i];
+    }
+
+    int cdf_min = 0;
+    for (int i = 0; i < 256; i++) {
+        if (cdf[i] > 0) {
+            cdf_min = cdf[i];
+            break;
+        }
+    }
+
+    if (total - cdf_min > 0) {
+        for (int y = 0; y < img->height; y++) {
+            for (int x = 0; x < img->width; x++) {
+                int old_y_int = (int)(Y[y][x] + 0.5f);
+                if (old_y_int < 0) old_y_int = 0;
+                if (old_y_int > 255) old_y_int = 255;
+
+                float new_y = ((float)(cdf[old_y_int] - cdf_min) / (total - cdf_min)) * 255.0f;
+                float u = U[y][x] ; 
+                float v = V[y][x];
+
+                float r_new = new_y + 1.403f * (v - 128.0f);
+                float g_new = new_y - 0.344f * (u - 128.0f) - 0.714f * (v - 128.0f);
+                float b_new = new_y + 1.773f * (u - 128.0f);
+
+                if (r_new < 0) r_new = 0; if (r_new > 255) r_new = 255;
+                if (g_new < 0) g_new = 0; if (g_new > 255) g_new = 255;
+                if (b_new < 0) b_new = 0; if (b_new > 255) b_new = 255;
+
+                img->data[y][x].red   = (uint8_t)(r_new + 0.5f);
+                img->data[y][x].green = (uint8_t)(g_new + 0.5f);
+                img->data[y][x].blue  = (uint8_t)(b_new + 0.5f);
+            }
+        }
+    }
+
+    for (int y = 0; y < img->height; y++) {
+        free(Y[y]);
+        free(U[y]);
+        free(V[y]);
+    }
+    free(Y);
+    free(U);
+    free(V);
+
+    bmp24_saveWithFilterName(path, "equalized", img);
 }
