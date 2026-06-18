@@ -8,10 +8,9 @@
 #include "../filter/menu_filtre.h"
 #include "../filter/filtre.h"
 
-// --- VARIABLES D'ÉTAT GLOBALES ET UNIQUES ---
-static void *image_actuelle = NULL; // Pointeur générique gérant t_bmp8* ou t_bmp24*
+static void *image_actuelle = NULL; 
 static char chemin_origine[256] = "";
-static int mode_24bit = 0;          // 0 = 8 bits (gris), 1 = 24 bits (couleur)
+static int mode_24bit = 0;          
 
 void main_menu(void) {
     printf("\n--Veuillez choisir une option--\n");
@@ -25,7 +24,7 @@ void main_menu(void) {
 void run_main_menu(void) {
     int choice = 0;
     while (choice != 5) {
-        main_menu(); // Affichage du menu standard
+        main_menu(); 
         printf("Votre choix : ");
         
         if (scanf("%d", &choice) != 1) {
@@ -39,7 +38,6 @@ void run_main_menu(void) {
         while ((c = getchar()) != '\n' && c != EOF); 
 
         if (choice == 1) {
-            // --- OPTION 1 : OUVRIR UNE IMAGE ---
             printf("Quel type d'image voulez-vous ouvrir ?\n");
             printf("  1. Image 8 bits (Niveaux de gris)\n");
             printf("  2. Image 24 bits (Couleur)\n");
@@ -49,7 +47,6 @@ void run_main_menu(void) {
             if (scanf("%d", &type_choice) == 1) {
                 while ((c = getchar()) != '\n' && c != EOF);
                 
-                // Libération de l'ancienne image si elle existe
                 if (image_actuelle != NULL) {
                     if (mode_24bit) bmp24_free((t_bmp24 *)image_actuelle);
                     else bmp8_free((t_bmp8 *)image_actuelle);
@@ -63,7 +60,6 @@ void run_main_menu(void) {
                     if (scanf("%255s", access_path) == 1) {
                         while ((c = getchar()) != '\n' && c != EOF);
                         
-                        // Nettoyage des guillemets éventuels
                         if (access_path[0] == '"') memmove(access_path, access_path + 1, strlen(access_path));
                         int len = strlen(access_path);
                         if (len > 0 && access_path[len - 1] == '"') access_path[len - 1] = '\0';
@@ -82,7 +78,6 @@ void run_main_menu(void) {
                     if (scanf("%255s", access_path) == 1) {
                         while ((c = getchar()) != '\n' && c != EOF);
                         
-                        // Nettoyage des guillemets éventuels
                         if (access_path[0] == '"') memmove(access_path, access_path + 1, strlen(access_path));
                         int len = strlen(access_path);
                         if (len > 0 && access_path[len - 1] == '"') access_path[len - 1] = '\0';
@@ -99,7 +94,6 @@ void run_main_menu(void) {
             }
         } 
         else if (choice == 2) {
-            // --- OPTION 2 : SAUVEGARDER ---
             if (image_actuelle == NULL) {
                 printf("Erreur : Aucune image en memoire.\n");
                 continue;
@@ -113,18 +107,15 @@ void run_main_menu(void) {
             }
         } 
         else if (choice == 3) {
-            // --- OPTION 3 : APPLIQUER UN FILTRE ---
             if (image_actuelle == NULL) {
                 printf("Erreur : Veuillez d'abord charger une image.\n");
                 continue;
             }
             
-            // Appel de ta fonction mise à jour dans menu_filtre.c
             choix_menu(image_actuelle, chemin_origine, mode_24bit);
-            choice = 0; // Réinitialisation de sécurité
+            choice = 0; 
         } 
         else if (choice == 4) {
-            // --- OPTION 4 : INFORMATIONS ---
             if (image_actuelle == NULL) {
                 printf("Aucune image chargee.\n");
             } else {
@@ -137,7 +128,6 @@ void run_main_menu(void) {
             }
         } 
         else if (choice == 5) {
-            // --- OPTION 5 : QUITTER ---
             if (image_actuelle != NULL) {
                 if (mode_24bit) bmp24_free((t_bmp24 *)image_actuelle);
                 else bmp8_free((t_bmp8 *)image_actuelle);

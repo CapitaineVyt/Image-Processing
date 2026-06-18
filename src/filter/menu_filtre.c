@@ -6,13 +6,11 @@
 #include "menu_filtre.h"    
 #include "filtre.h"
 
-// --- SOUS-FONCTIONS DE GESTION DU CHOIX ---
-
 static void choix_1(void *img, const char *path, int is_24bit){
     if (is_24bit) {
-        bmp24_negative((t_bmp24 *)img, path); // Version couleur
+        bmp24_negative((t_bmp24 *)img, path);
     } else {
-        bmp8_negative((t_bmp8 *)img, path);   // Version niveau de gris
+        bmp8_negative((t_bmp8 *)img, path);
     }
 }
 
@@ -24,67 +22,71 @@ static void choix_2(void *img, const char *path, int is_24bit){
         while((c = getchar()) != '\n' && c != EOF);
     }
     int c;
-    while ((c = getchar()) != '\n' && c != EOF); // Nettoyage propre du buffer
+    while ((c = getchar()) != '\n' && c != EOF);
 
     if (is_24bit) {
-        bmp24_brightness((t_bmp24 *)img, intensite, path); // Version couleur
+        bmp24_brightness((t_bmp24 *)img, intensite, path);
     } else {
-        bmp8_brightness((t_bmp8 *)img, intensite, path);   // Version niveau de gris
+        bmp8_brightness((t_bmp8 *)img, intensite, path);
     }
 }
 
 static void choix_3(void *img, const char *path, int is_24bit){
     if (is_24bit) {
-        // En 24 bits, la binarisation n'a pas de sens direct, 
-        // le sujet demande une conversion en niveaux de gris (Grayscale)
         bmp24_grayscale((t_bmp24 *)img, path);
     } else {
         int seuil = 128;
-        bmp8_threshold((t_bmp8 *)img, seuil, path); // Version niveau de gris
+        bmp8_threshold((t_bmp8 *)img, seuil, path);
     }
 }
 
 static void choix_4(void *img, const char *path, int is_24bit){
     if (is_24bit) {
-        bmp24_boxBlur((t_bmp24 *)img, path); // Version couleur
+        bmp24_boxBlur((t_bmp24 *)img, path);
     } else {
-        bmp8_boxBlur((t_bmp8 *)img, path);   // Version niveau de gris
+        bmp8_boxBlur((t_bmp8 *)img, path);
     }
 }
 
 static void choix_5(void *img, const char *path, int is_24bit){
     if (is_24bit) {
-        bmp24_gaussianBlur((t_bmp24 *)img, path); // Version couleur
+        bmp24_gaussianBlur((t_bmp24 *)img, path);
     } else {
-        bmp8_gaussianBlur((t_bmp8 *)img, path);   // Version niveau de gris
+        bmp8_gaussianBlur((t_bmp8 *)img, path);
     }
 }
 
 static void choix_6(void *img, const char *path, int is_24bit){
     if (is_24bit) {
-        bmp24_sharpen((t_bmp24 *)img, path); // Version couleur
+        bmp24_sharpen((t_bmp24 *)img, path);
     } else {
-        bmp8_sharpen((t_bmp8 *)img, path);   // Version niveau de gris
+        bmp8_sharpen((t_bmp8 *)img, path);
     }
 }
 
 static void choix_7(void *img, const char *path, int is_24bit){
     if (is_24bit) {
-        bmp24_outline((t_bmp24 *)img, path); // Version couleur
+        bmp24_outline((t_bmp24 *)img, path);
     } else {
-        bmp8_outline((t_bmp8 *)img, path);   // Version niveau de gris
+        bmp8_outline((t_bmp8 *)img, path);
     }
 }
 
 static void choix_8(void *img, const char *path, int is_24bit){
     if (is_24bit) {
-        bmp24_emboss((t_bmp24 *)img, path); // Version couleur
+        bmp24_emboss((t_bmp24 *)img, path);
     } else {
-        bmp8_emboss((t_bmp8 *)img, path);   // Version niveau de gris
+        bmp8_emboss((t_bmp8 *)img, path);
     }
 }
 
-// --- FONCTION PRINCIPALE APPELÉE PAR LE MAIN MENU ---
+static void choix_10(void *img, const char *path, int is_24bit){
+    if (is_24bit) {
+        bmp24_histogramEqualization((t_bmp24 *)img, path);
+    } else {
+        bmp8_histogramEqualization((t_bmp8 *)img, path);
+    }
+}
 
 void choix_menu(void *img, const char *path, int is_24bit){
 
@@ -106,7 +108,7 @@ void choix_menu(void *img, const char *path, int is_24bit){
         }
     
         int c;
-        while ((c = getchar()) != '\n' && c != EOF); // Nettoyage systématique
+        while ((c = getchar()) != '\n' && c != EOF);
 
         if (choix == 1){
             choix_1(img, path, is_24bit);
@@ -125,6 +127,8 @@ void choix_menu(void *img, const char *path, int is_24bit){
             choix_7(img, path, is_24bit);
         }else if(choix == 8){
             choix_8(img, path, is_24bit);
+        }else if(choix == 10){
+            choix_10(img, path, is_24bit);
         }else if(choix == 9){
             printf("Retour au menu principal.\n");
         }
@@ -142,4 +146,5 @@ void filtre_menu(void){
     printf("\t7. Contours\n");
     printf("\t8. Relief\n");
     printf("\t9. Retourner au menu principal\n");
+    printf("\t10. Egalisation d'histogramme (Partie 3)\n");
 }
