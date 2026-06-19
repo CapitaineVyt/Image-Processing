@@ -146,5 +146,5 @@ void filtre_menu(void){
     printf("\t7. Contours\n");
     printf("\t8. Relief\n");
     printf("\t9. Retourner au menu principal\n");
-    printf("\t10. Egalisation d'histogramme (Partie 3)\n");
+    printf("\t10. Egalisation d'histogramme\n");
 }

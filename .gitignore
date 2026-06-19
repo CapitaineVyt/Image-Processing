@@ -1,9 +1,6 @@
 # --- VS Code ---
 .vscode/
 
-# --- Dossiers d'images ---
-output/
-
 # --- Compilation (C Language) ---
 *.o
 *.obj
